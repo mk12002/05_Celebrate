@@ -1,0 +1,16 @@
+# One-click deploy on Render (free tier): New + > Blueprint > select this repo.
+services:
+  - type: web
+    name: celebrate-ai-event-planner
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GEMINI_MODEL
+        value: gemini-3.6-flash
+      - key: GEMINI_API_KEY
+        sync: false
