@@ -158,6 +158,7 @@ export function templatePlanContent(input, { budget, phases }) {
   const theme = THEMES[type];
   const amountFor = (id) => budget.categories.find((c) => c.id === id)?.amount ?? 0;
   const label = input.title || `your ${type}`;
+  const date = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeZone: 'UTC' }).format(new Date(`${input.eventDate}T00:00:00Z`));
 
   return {
     summary:
@@ -180,7 +181,7 @@ export function templatePlanContent(input, { budget, phases }) {
     })),
     theme: {
       ...theme,
-      invitation: `You're invited to ${label}! Join us on ${input.eventDate}${input.location ? ` in ${input.location}` : ''} to celebrate together. Please RSVP so we can plan for you.`,
+      invitation: `You're invited to ${label}! Join us on ${date}${input.location ? ` in ${input.location}` : ''} to celebrate together. Please RSVP so we can plan for you.`,
     },
   };
 }

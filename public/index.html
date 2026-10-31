@@ -35,31 +35,57 @@
     </header>
 
     <main id="main" tabindex="-1">
-      <section id="planner-section" class="card form-card" aria-labelledby="form-title">
-        <h2 id="form-title" class="page-title">Plan your celebration</h2>
-        <p class="lede">
-          Tell us about your event. Gemini drafts a budget, a countdown checklist, vendors to book and a theme, then
-          you refine it by chatting.
-        </p>
+      <section id="planner-section" class="planner" aria-labelledby="form-title">
+        <div class="hero-copy">
+          <p class="eyebrow eyebrow-pill"><span aria-hidden="true">✦</span> Powered by Google Gemini</p>
+          <h2 id="form-title" class="page-title">Plan your celebration</h2>
+          <p class="lede">
+            Tell us about your event. Gemini drafts a budget, a countdown checklist, vendors to book and a theme, then
+            you refine it by chatting.
+          </p>
+          <ul class="features">
+            <li>
+              <span class="feature-icon" aria-hidden="true">💰</span>
+              <span><strong>A budget that always balances</strong> Split across categories and scaled to your guest count.</span>
+            </li>
+            <li>
+              <span class="feature-icon" aria-hidden="true">🗓</span>
+              <span><strong>A countdown checklist</strong> Phases from months out to the day itself, with a run sheet.</span>
+            </li>
+            <li>
+              <span class="feature-icon" aria-hidden="true">🤝</span>
+              <span><strong>Vendors to book first</strong> Priorities, cost estimates and questions to ask.</span>
+            </li>
+            <li>
+              <span class="feature-icon" aria-hidden="true">🎨</span>
+              <span><strong>Theme, palette and invitation</strong> Decor, activities and menu ideas for your vibe.</span>
+            </li>
+            <li>
+              <span class="feature-icon" aria-hidden="true">💬</span>
+              <span><strong>Refine it by chatting</strong> "Cut catering by 10% and move it to live music."</span>
+            </li>
+          </ul>
+        </div>
 
-        <form id="plan-form" novalidate>
+        <form id="plan-form" class="card form-card" novalidate>
           <fieldset class="event-types">
-            <legend>Event type <span class="req" aria-hidden="true">*</span></legend>
+            <legend>What are you celebrating? <span class="req" aria-hidden="true">*</span></legend>
             <label class="type-option">
               <input type="radio" name="eventType" value="wedding" checked />
-              <span><span aria-hidden="true">💍</span> Wedding</span>
+              <span class="type-tile"><span class="type-emoji" aria-hidden="true">💍</span> Wedding</span>
             </label>
             <label class="type-option">
               <input type="radio" name="eventType" value="birthday" />
-              <span><span aria-hidden="true">🎂</span> Birthday</span>
+              <span class="type-tile"><span class="type-emoji" aria-hidden="true">🎂</span> Birthday</span>
             </label>
             <label class="type-option">
               <input type="radio" name="eventType" value="community" />
-              <span><span aria-hidden="true">🎪</span> Community event</span>
+              <span class="type-tile"><span class="type-emoji" aria-hidden="true">🎪</span> Community event</span>
             </label>
           </fieldset>
 
           <div class="grid">
+            <h3 class="form-section span-2">The basics</h3>
             <div class="field span-2">
               <label for="title">Event name</label>
               <input id="title" name="title" type="text" maxlength="80" placeholder="Priya &amp; Sam's wedding" autocomplete="off" />
@@ -95,6 +121,7 @@
               </select>
             </div>
 
+            <h3 class="form-section span-2">Place &amp; style</h3>
             <div class="field">
               <label for="location">Location</label>
               <input id="location" name="location" type="text" maxlength="100" placeholder="Jaipur, India" autocomplete="address-level2" />
@@ -124,9 +151,11 @@
           <div id="form-error" class="alert" role="alert" hidden></div>
 
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary" id="generate-btn">
+            <button type="submit" class="btn btn-primary btn-hero" id="generate-btn">
+              <span aria-hidden="true">✦</span>
               <span class="btn-label">Generate my plan</span>
             </button>
+            <p class="hint center">Gemini usually takes 15–30 seconds to draft a full plan.</p>
           </div>
         </form>
       </section>
@@ -135,16 +164,30 @@
 
       <div id="workspace" class="workspace" hidden>
         <section id="results" class="card results" aria-labelledby="results-title">
+          <div class="theme-stripe" aria-hidden="true"></div>
           <div class="results-header">
             <div>
               <p class="eyebrow" id="results-eyebrow"></p>
-              <h2 id="results-title" tabindex="-1">Your plan</h2>
+              <h2 id="results-title" class="results-title" tabindex="-1">Your plan</h2>
+              <p class="results-meta" id="results-meta"></p>
             </div>
             <div class="toolbar" role="group" aria-label="Plan actions">
-              <button type="button" class="btn btn-ghost" id="edit-btn">Edit details</button>
-              <button type="button" class="btn btn-ghost" id="calendar-btn">Add to calendar (.ics)</button>
-              <button type="button" class="btn btn-ghost" id="download-btn">Download JSON</button>
-              <button type="button" class="btn btn-ghost" id="print-btn">Print</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="edit-btn">
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4" /></svg>
+                Edit details
+              </button>
+              <button type="button" class="btn btn-ghost btn-sm" id="calendar-btn">
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6h16v14H4zM4 10h16M8 3v5M16 3v5" /></svg>
+                Add to calendar (.ics)
+              </button>
+              <button type="button" class="btn btn-ghost btn-sm" id="download-btn">
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg>
+                Download JSON
+              </button>
+              <button type="button" class="btn btn-ghost btn-sm" id="print-btn">
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 9V4h10v5M7 17H4v-7h16v7h-3M7 14h10v6H7z" /></svg>
+                Print
+              </button>
             </div>
           </div>
 
@@ -153,11 +196,11 @@
           </div>
 
           <div class="tabs" role="tablist" aria-label="Plan sections">
-            <button type="button" role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true">Overview</button>
-            <button type="button" role="tab" id="tab-budget" aria-controls="panel-budget" aria-selected="false" tabindex="-1">Budget</button>
-            <button type="button" role="tab" id="tab-timeline" aria-controls="panel-timeline" aria-selected="false" tabindex="-1">Timeline</button>
-            <button type="button" role="tab" id="tab-vendors" aria-controls="panel-vendors" aria-selected="false" tabindex="-1">Vendors</button>
-            <button type="button" role="tab" id="tab-theme" aria-controls="panel-theme" aria-selected="false" tabindex="-1">Theme</button>
+            <button type="button" role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true"><span aria-hidden="true">✦</span> Overview</button>
+            <button type="button" role="tab" id="tab-budget" aria-controls="panel-budget" aria-selected="false" tabindex="-1"><span aria-hidden="true">💰</span> Budget</button>
+            <button type="button" role="tab" id="tab-timeline" aria-controls="panel-timeline" aria-selected="false" tabindex="-1"><span aria-hidden="true">🗓</span> Timeline</button>
+            <button type="button" role="tab" id="tab-vendors" aria-controls="panel-vendors" aria-selected="false" tabindex="-1"><span aria-hidden="true">🤝</span> Vendors</button>
+            <button type="button" role="tab" id="tab-theme" aria-controls="panel-theme" aria-selected="false" tabindex="-1"><span aria-hidden="true">🎨</span> Theme</button>
           </div>
 
           <div role="tabpanel" id="panel-overview" aria-labelledby="tab-overview" tabindex="0" class="panel"></div>
@@ -168,10 +211,17 @@
         </section>
 
         <aside id="chat" class="card chat" aria-labelledby="chat-title">
-          <h2 id="chat-title">Refine with AI</h2>
-          <p class="hint">Ask for changes in plain language. Budget edits are applied exactly and always balance.</p>
+          <div class="chat-head">
+            <span class="chat-avatar" aria-hidden="true">✦</span>
+            <div>
+              <h2 id="chat-title">Refine with AI</h2>
+              <p class="hint">Ask in plain language. Budget edits are applied exactly and always balance.</p>
+            </div>
+          </div>
           <div id="chat-log" class="chat-log" role="log" aria-live="polite" aria-relevant="additions" tabindex="0" aria-label="Conversation"></div>
-          <div class="chips" role="group" aria-label="Suggested requests">
+          <p class="typing" aria-hidden="true"><span></span><span></span><span></span> Gemini is thinking</p>
+          <p class="chips-label" id="chips-label">Try asking</p>
+          <div class="chips" role="group" aria-labelledby="chips-label">
             <button type="button" class="chip">Reduce the catering budget by 10% and reallocate it to live music</button>
             <button type="button" class="chip">Suggest indoor backup activities for rainy weather</button>
             <button type="button" class="chip">We now expect 20 more guests. What should change?</button>

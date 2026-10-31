@@ -149,4 +149,28 @@ describe('UI: dom helper', () => {
     el.click();
     assert.equal(clicked, true);
   });
+
+  it('sets CSS custom properties through the CSSOM', () => {
+    const el = h('div', { style: { '--swatch': '#123456' } });
+    assert.equal(el.style.getPropertyValue('--swatch'), '#123456');
+  });
+});
+
+describe('UI: budget chart', () => {
+  it('builds one donut slice per category that ends at 100%', () => {
+    const gradient = render.donutGradient([
+      { amount: 300 },
+      { amount: 100 },
+    ]);
+    assert.match(gradient, /^conic-gradient\(/);
+    assert.match(gradient, /0\.00% 75\.00%/);
+    assert.match(gradient, /75\.00% 100\.00%\)$/);
+  });
+
+  it('tints the plan header with the theme palette', async () => {
+    const plan = await samplePlan();
+    render.renderPlan(plan, handlers);
+    const results = dom.window.document.getElementById('results');
+    assert.equal(results.style.getPropertyValue('--theme-1'), plan.theme.palette[0].hex);
+  });
 });

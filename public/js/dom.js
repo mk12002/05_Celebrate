@@ -12,13 +12,21 @@ export function h(tag, props, ...children) {
     if (value === undefined || value === null || value === false) continue;
     if (key === 'className') el.className = String(value);
     else if (key === 'dataset') Object.assign(el.dataset, value);
-    else if (key === 'style') Object.assign(el.style, value);
+    else if (key === 'style') setStyles(el, value);
     else if (key.startsWith('on') && typeof value === 'function') el.addEventListener(key.slice(2), /** @type {EventListener} */ (value));
     else if (key in el && typeof value !== 'string') el[key] = value;
     else el.setAttribute(key, value === true ? '' : String(value));
   }
   append(el, children);
   return el;
+}
+
+/** Applies inline styles through the CSSOM (CSP-safe); `--*` keys set custom properties. */
+export function setStyles(el, styles) {
+  for (const [name, value] of Object.entries(styles)) {
+    if (name.startsWith('--')) el.style.setProperty(name, String(value));
+    else el.style[name] = value;
+  }
 }
 
 function append(el, children) {
