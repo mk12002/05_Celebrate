@@ -81,6 +81,14 @@ describe('API', () => {
     assert.match(res.text, /<html lang="en">/);
   });
 
+  it('revalidates static assets so a deploy never mixes old CSS with new HTML', async () => {
+    const app = buildApp({ env: { NODE_ENV: 'production' } });
+    const css = await request(app).get('/css/styles.css').expect(200);
+    assert.equal(css.headers['cache-control'], 'no-cache');
+    assert.ok(css.headers.etag);
+    await request(app).get('/css/styles.css').set('If-None-Match', css.headers.etag).expect(304);
+  });
+
   it('rate limits the generation endpoints', async () => {
     const app = buildApp({ env: { RATE_LIMIT_PER_MINUTE: '2' } });
     await request(app).post('/api/plan').send({}).expect(400);

@@ -95,9 +95,10 @@ export function createApp({ planner, config, logger = createLogger() }) {
   app.use(
     express.static(PUBLIC_DIR, {
       extensions: ['html'],
-      maxAge: config.nodeEnv === 'production' ? '1h' : 0,
-      setHeaders(res, filePath) {
-        if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache');
+      // Revalidate every asset (cheap 304s via ETag) so HTML, CSS and JS
+      // from one deploy are never mixed with stale files from the last.
+      setHeaders(res) {
+        res.setHeader('Cache-Control', 'no-cache');
       },
     }),
   );
