@@ -115,7 +115,10 @@ export function buildChatResponseSchema({ categoryIds, phaseIds }) {
     properties: {
       reply: str('Friendly, concise answer explaining what changed or what you suggest'),
       updateTheme: { type: 'boolean', description: 'true ONLY if the user explicitly asked to change the theme' },
-      updateDayOf: { type: 'boolean', description: 'true ONLY if the user explicitly asked to change the day-of schedule' },
+      updateDayOf: {
+        type: 'boolean',
+        description: 'true ONLY if the user explicitly asked to change the day-of schedule',
+      },
       budgetOperations: {
         type: 'array',
         maxItems: 5,
@@ -143,7 +146,12 @@ export function buildChatResponseSchema({ categoryIds, phaseIds }) {
           required: ['phaseId', 'text'],
         },
       },
-      addVendors: { type: 'array', maxItems: 4, items: vendorSchema(categoryIds), description: 'New vendors only; empty if none' },
+      addVendors: {
+        type: 'array',
+        maxItems: 4,
+        items: vendorSchema(categoryIds),
+        description: 'New vendors only; empty if none',
+      },
       addActivities: strList('New activity ideas you suggested in the reply; empty if none', 6),
       theme: { ...themeSchema, description: 'Omit unless updateTheme is true' },
       dayOf: { ...dayOfSchema, description: 'Full replacement schedule; omit unless updateDayOf is true' },

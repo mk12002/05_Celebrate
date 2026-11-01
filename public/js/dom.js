@@ -13,8 +13,9 @@ export function h(tag, props, ...children) {
     if (key === 'className') el.className = String(value);
     else if (key === 'dataset') Object.assign(el.dataset, value);
     else if (key === 'style') setStyles(el, value);
-    else if (key.startsWith('on') && typeof value === 'function') el.addEventListener(key.slice(2), /** @type {EventListener} */ (value));
-    else if (key in el && typeof value !== 'string') el[key] = value;
+    else if (key.startsWith('on') && typeof value === 'function') {
+      el.addEventListener(key.slice(2), /** @type {EventListener} */ (value));
+    } else if (key in el && typeof value !== 'string') el[key] = value;
     else el.setAttribute(key, value === true ? '' : String(value));
   }
   append(el, children);

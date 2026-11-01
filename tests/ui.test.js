@@ -139,7 +139,19 @@ describe('UI: rendering', () => {
 describe('UI: dom helper', () => {
   it('sets attributes, properties, styles and listeners', () => {
     let clicked = false;
-    const el = h('button', { className: 'btn', 'aria-label': 'Go', disabled: true, style: { width: '10px' }, onclick: () => (clicked = true) }, 'Go', null, ['!']);
+    const el = h(
+      'button',
+      {
+        className: 'btn',
+        'aria-label': 'Go',
+        disabled: true,
+        style: { width: '10px' },
+        onclick: () => (clicked = true),
+      },
+      'Go',
+      null,
+      ['!'],
+    );
     assert.equal(el.className, 'btn');
     assert.equal(el.getAttribute('aria-label'), 'Go');
     assert.equal(el.disabled, true);
@@ -158,10 +170,7 @@ describe('UI: dom helper', () => {
 
 describe('UI: budget chart', () => {
   it('builds one donut slice per category that ends at 100%', () => {
-    const gradient = render.donutGradient([
-      { amount: 300 },
-      { amount: 100 },
-    ]);
+    const gradient = render.donutGradient([{ amount: 300 }, { amount: 100 }]);
     assert.match(gradient, /^conic-gradient\(/);
     assert.match(gradient, /0\.00% 75\.00%/);
     assert.match(gradient, /75\.00% 100\.00%\)$/);

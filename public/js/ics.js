@@ -6,11 +6,7 @@
 
 /** Escapes text values per RFC 5545 §3.3.11. */
 export function escapeIcsText(value) {
-  return String(value)
-    .replace(/\\/g, '\\\\')
-    .replace(/;/g, '\\;')
-    .replace(/,/g, '\\,')
-    .replace(/\r?\n/g, '\\n');
+  return String(value).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
 }
 
 /** Folds lines longer than 75 characters (RFC 5545 §3.1). */
@@ -28,7 +24,10 @@ function nextDay(iso) {
 }
 
 function stamp(now) {
-  return now.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  return now
+    .toISOString()
+    .replace(/[-:]/g, '')
+    .replace(/\.\d{3}/, '');
 }
 
 /**

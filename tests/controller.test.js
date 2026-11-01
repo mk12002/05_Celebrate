@@ -101,13 +101,21 @@ describe('controller: start-up', () => {
     await ctx.controller.init();
     assert.match($('ai-status').textContent, /template mode/);
 
-    ctx = setup({ api: { getHealth: async () => { throw new Error('offline'); } } });
+    ctx = setup({
+      api: {
+        getHealth: async () => {
+          throw new Error('offline');
+        },
+      },
+    });
     await ctx.controller.init();
     assert.equal($('ai-status').textContent, 'Server unreachable');
   });
 
   it('restores a saved session', async () => {
-    const { controller } = setup({ session: { plan: structuredClone(basePlan), chat: [{ role: 'user', text: 'Hi' }] } });
+    const { controller } = setup({
+      session: { plan: structuredClone(basePlan), chat: [{ role: 'user', text: 'Hi' }] },
+    });
     await controller.init();
     assert.equal($('workspace').hidden, false);
     assert.equal($('planner-section').hidden, true);
@@ -202,8 +210,17 @@ describe('controller: plan form', () => {
   });
 
   it('shows server-side field errors and messages', async () => {
-    const error = new ApiError('Invalid request', { status: 400, details: [{ field: 'budget', message: 'Too small' }] });
-    const { controller } = setup({ api: { createPlan: async () => { throw error; } } });
+    const error = new ApiError('Invalid request', {
+      status: 400,
+      details: [{ field: 'budget', message: 'Too small' }],
+    });
+    const { controller } = setup({
+      api: {
+        createPlan: async () => {
+          throw error;
+        },
+      },
+    });
     await controller.init();
     fillValidForm();
     await submitPlan();
@@ -215,7 +232,13 @@ describe('controller: plan form', () => {
   });
 
   it('shows a generic message for unexpected errors', async () => {
-    const { controller } = setup({ api: { createPlan: async () => { throw new TypeError('boom'); } } });
+    const { controller } = setup({
+      api: {
+        createPlan: async () => {
+          throw new TypeError('boom');
+        },
+      },
+    });
     await controller.init();
     fillValidForm();
     await submitPlan();
@@ -237,7 +260,10 @@ describe('controller: plan form', () => {
 
 describe('controller: chat', () => {
   async function ready(apiOverrides) {
-    const ctx = setup({ api: apiOverrides, session: { plan: structuredClone(basePlan), chat: [{ role: 'assistant', text: 'Hi' }] } });
+    const ctx = setup({
+      api: apiOverrides,
+      session: { plan: structuredClone(basePlan), chat: [{ role: 'assistant', text: 'Hi' }] },
+    });
     await ctx.controller.init();
     return ctx;
   }
@@ -283,11 +309,15 @@ describe('controller: chat', () => {
     const chip = doc.querySelector('.chip');
     chip.click();
     await flush();
-    assert.equal(calls.refinePlan[0].message, chip.textContent);
+    assert.equal(calls.refinePlan[0].message, 'Reduce the catering budget by 10% and reallocate it to live music');
   });
 
   it('keeps the message and explains when the request fails', async () => {
-    await ready({ refinePlan: async () => { throw new Error('Too many requests'); } });
+    await ready({
+      refinePlan: async () => {
+        throw new Error('Too many requests');
+      },
+    });
     $('chat-input').value = 'More music';
     $('chat-form').requestSubmit();
     await flush();
@@ -307,7 +337,8 @@ describe('controller: plan interactions', () => {
     await ready();
     const { KeyboardEvent } = dom.window;
     const selected = () => doc.querySelector('[role="tab"][aria-selected="true"]').id;
-    const visiblePanels = () => [...doc.querySelectorAll('[role="tabpanel"]')].filter((p) => !p.hidden).map((p) => p.id);
+    const visiblePanels = () =>
+      [...doc.querySelectorAll('[role="tabpanel"]')].filter((p) => !p.hidden).map((p) => p.id);
 
     $('tab-budget').click();
     assert.equal(selected(), 'tab-budget');

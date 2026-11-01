@@ -147,7 +147,10 @@ export function createController({
       const field = form.elements.namedItem(name);
       if (!field) continue;
       if (field instanceof doc.defaultView.RadioNodeList) {
-        for (const radio of field) /** @type {HTMLInputElement} */ (radio).checked = /** @type {HTMLInputElement} */ (radio).value === value;
+        for (const radio of field)
+        /** @type {HTMLInputElement} */ {
+          radio.checked = /** @type {HTMLInputElement} */ (radio).value === value;
+        }
       } else {
         /** @type {HTMLInputElement} */ (field).value = String(value);
       }
@@ -203,7 +206,10 @@ export function createController({
       const { plan } = await api.createPlan(values);
       state.plan = plan;
       state.chat = [
-        { role: 'assistant', text: 'Your plan is ready! Ask me to adjust anything: budget splits, timing, vendors or the theme.' },
+        {
+          role: 'assistant',
+          text: 'Your plan is ready! Ask me to adjust anything: budget splits, timing, vendors or the theme.',
+        },
       ];
       persist();
       renderChat();
@@ -383,7 +389,8 @@ export function createController({
       }
     });
     for (const chip of doc.querySelectorAll('.chip')) {
-      chip.addEventListener('click', () => sendChat(chip.textContent));
+      // Collapse source-formatting whitespace so the message matches the visible label.
+      chip.addEventListener('click', () => sendChat(chip.textContent.replace(/\s+/g, ' ')));
     }
     for (const tab of tabs()) {
       tab.addEventListener('click', () => selectTab(tab.id));

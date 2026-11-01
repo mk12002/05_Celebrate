@@ -50,8 +50,7 @@ export function parseIsoDate(iso) {
 }
 
 /** Returns UTC midnight for the given instant. */
-export const startOfUtcDay = (date) =>
-  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+export const startOfUtcDay = (date) => Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 
 /** Formats a UTC timestamp as YYYY-MM-DD. */
 export const toIsoDate = (ts) => new Date(ts).toISOString().slice(0, 10);

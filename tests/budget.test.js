@@ -104,10 +104,21 @@ describe('budget engine: applyBudgetOperations', () => {
 
   it('caps absolute moves at the source amount', () => {
     const decor = budget.categories.find((c) => c.id === 'decor').amount;
-    const { budget: next } = applyBudgetOperations(budget, [{ type: 'move', from: 'decor', to: 'venue', amount: 1e9 }], ctx);
-    assert.equal(next.categories.find((c) => c.id === 'decor'), undefined, 'emptied category is removed');
+    const { budget: next } = applyBudgetOperations(
+      budget,
+      [{ type: 'move', from: 'decor', to: 'venue', amount: 1e9 }],
+      ctx,
+    );
+    assert.equal(
+      next.categories.find((c) => c.id === 'decor'),
+      undefined,
+      'emptied category is removed',
+    );
     assert.equal(sum(next.categories), 30000);
-    assert.equal(next.categories.find((c) => c.id === 'venue').amount, budget.categories.find((c) => c.id === 'venue').amount + decor);
+    assert.equal(
+      next.categories.find((c) => c.id === 'venue').amount,
+      budget.categories.find((c) => c.id === 'venue').amount + decor,
+    );
   });
 
   it('rescales every category with set_total', () => {
@@ -124,18 +135,34 @@ describe('budget engine: applyBudgetOperations', () => {
   });
 
   it('skips moves from unknown or empty categories', () => {
-    const { budget: next, changes } = applyBudgetOperations(budget, [{ type: 'move', from: 'yachts', to: 'decor', percent: 10 }], ctx);
-    assert.deepEqual(next.categories.map((c) => c.amount), budget.categories.map((c) => c.amount));
+    const { budget: next, changes } = applyBudgetOperations(
+      budget,
+      [{ type: 'move', from: 'yachts', to: 'decor', percent: 10 }],
+      ctx,
+    );
+    assert.deepEqual(
+      next.categories.map((c) => c.amount),
+      budget.categories.map((c) => c.amount),
+    );
     assert.match(changes[0], /Skipped/);
   });
 
   it('warns when contingency drops below 5%', () => {
-    const { budget: next } = applyBudgetOperations(budget, [{ type: 'move', from: 'contingency', to: 'decor', percent: 80 }], ctx);
+    const { budget: next } = applyBudgetOperations(
+      budget,
+      [{ type: 'move', from: 'contingency', to: 'decor', percent: 80 }],
+      ctx,
+    );
     assert.ok(next.warnings.some((w) => /Contingency/.test(w)));
   });
 
   it('finalizeBudget recomputes totals from category amounts', () => {
-    const tampered = { ...budget, total: 1, perGuest: 1, categories: budget.categories.map((c) => ({ ...c, percent: 99 })) };
+    const tampered = {
+      ...budget,
+      total: 1,
+      perGuest: 1,
+      categories: budget.categories.map((c) => ({ ...c, percent: 99 })),
+    };
     const fixed = finalizeBudget(tampered, ctx);
     assert.equal(fixed.total, 30000);
     assert.equal(Math.round(fixed.categories.reduce((s, c) => s + c.percent, 0)), 100);

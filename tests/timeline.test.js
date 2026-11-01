@@ -8,18 +8,27 @@ const NOW = new Date('2026-01-01T10:00:00Z');
 describe('timeline: computePhases', () => {
   it('includes every phase for events more than a year away', () => {
     const phases = computePhases('2027-03-01', NOW);
-    assert.deepEqual(phases.map((p) => p.id), PHASES.map((p) => p.id));
+    assert.deepEqual(
+      phases.map((p) => p.id),
+      PHASES.map((p) => p.id),
+    );
     assert.equal(phases[0].startsNow, true);
     assert.ok(phases.slice(1).every((p) => !p.startsNow));
   });
 
   it('drops phases that no longer fit the lead time', () => {
     const phases = computePhases('2026-01-21', NOW); // 20 days away
-    assert.deepEqual(phases.map((p) => p.id), ['w2', 'w1', 'day']);
+    assert.deepEqual(
+      phases.map((p) => p.id),
+      ['w2', 'w1', 'day'],
+    );
   });
 
   it('always includes the event day, even for same-day events', () => {
-    assert.deepEqual(computePhases('2026-01-01', NOW).map((p) => p.id), ['day']);
+    assert.deepEqual(
+      computePhases('2026-01-01', NOW).map((p) => p.id),
+      ['day'],
+    );
   });
 
   it('computes target dates counting back from the event', () => {

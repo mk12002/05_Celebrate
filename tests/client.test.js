@@ -132,7 +132,10 @@ describe('client ics.js', () => {
     assert.ok(ics.includes(`DTSTART;VALUE=DATE:${plan.input.eventDate.replaceAll('-', '')}`));
     assert.ok(ics.includes('DTSTAMP:20261001T083000Z'));
     assert.ok(ics.includes('SUMMARY:Sam & Priya'));
-    assert.ok(lines.every((line) => line.length <= 75), 'all lines folded');
+    assert.ok(
+      lines.every((line) => line.length <= 75),
+      'all lines folded',
+    );
   });
 
   it('marks completed tasks and handles month-end dates', () => {

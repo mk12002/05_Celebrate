@@ -51,8 +51,14 @@ describe('validation: event input', () => {
 describe('validation: AI output', () => {
   it('normalises a plan response, dropping invalid colours and times', () => {
     const data = aiPlanSchema.parse(aiPlanResponse);
-    assert.deepEqual(data.theme.palette.map((c) => c.hex), ['#556B2F']);
-    assert.deepEqual(data.dayOf.map((d) => d.time), ['15:00']);
+    assert.deepEqual(
+      data.theme.palette.map((c) => c.hex),
+      ['#556B2F'],
+    );
+    assert.deepEqual(
+      data.dayOf.map((d) => d.time),
+      ['15:00'],
+    );
   });
 
   it('truncates over-long strings and lists instead of failing', () => {

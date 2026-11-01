@@ -86,10 +86,7 @@ export function createApp({ planner, config, logger = createLogger() }) {
   );
   app.use('/api/plan', apiLimiter);
   app.use('/api/chat', apiLimiter);
-  app.use(
-    '/api',
-    createApiRouter({ planner, aiEnabled: Boolean(config.geminiApiKey), model: config.geminiModel }),
-  );
+  app.use('/api', createApiRouter({ planner, aiEnabled: Boolean(config.geminiApiKey), model: config.geminiModel }));
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }));
 
   app.use(

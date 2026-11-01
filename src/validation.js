@@ -1,12 +1,5 @@
 import { z } from 'zod';
-import {
-  CURRENCY_CODES,
-  EVENT_TYPES,
-  LIMITS,
-  SETTINGS,
-  VENDOR_PRIORITIES,
-  VENDOR_STATUSES,
-} from './constants.js';
+import { CURRENCY_CODES, EVENT_TYPES, LIMITS, SETTINGS, VENDOR_PRIORITIES, VENDOR_STATUSES } from './constants.js';
 import { daysUntil, parseIsoDate } from './utils.js';
 import { PHASE_IDS } from './services/timeline.js';
 
@@ -104,9 +97,7 @@ export const planSchema = z.strictObject({
           label: cleanText(40),
           dueDate: isoDate,
           startsNow: z.boolean(),
-          tasks: z
-            .array(z.strictObject({ id: z.string().max(64), text: cleanText(300), done: z.boolean() }))
-            .max(30),
+          tasks: z.array(z.strictObject({ id: z.string().max(64), text: cleanText(300), done: z.boolean() })).max(30),
         }),
       )
       .max(PHASE_IDS.length),
@@ -144,8 +135,7 @@ export const chatRequestSchema = z.strictObject({
 
 const aiText = (max) => z.coerce.string().transform((s) => s.replace(CONTROL_CHARS, '').trim().slice(0, max));
 const aiList = (item, max) => z.array(item).transform((items) => items.slice(0, max));
-const aiTextList = (itemMax, max) =>
-  aiList(aiText(itemMax), max).transform((items) => items.filter(Boolean));
+const aiTextList = (itemMax, max) => aiList(aiText(itemMax), max).transform((items) => items.filter(Boolean));
 const aiNumber = z.coerce.number().transform((n) => (Number.isFinite(n) ? Math.max(0, n) : 0));
 
 const aiVendor = z.object({

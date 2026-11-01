@@ -12,7 +12,9 @@ function buildApp({ planner = createPlanner({ logger: silentLogger }), env = {} 
 
 describe('API', () => {
   it('GET /api/health reports AI status without leaking the key', async () => {
-    const res = await request(buildApp({ env: { GEMINI_API_KEY: 'secret-key' } })).get('/api/health').expect(200);
+    const res = await request(buildApp({ env: { GEMINI_API_KEY: 'secret-key' } }))
+      .get('/api/health')
+      .expect(200);
     assert.deepEqual(res.body, { status: 'ok', ai: true, model: 'gemini-3.6-flash' });
     assert.ok(!JSON.stringify(res.body).includes('secret-key'));
   });
@@ -29,7 +31,10 @@ describe('API', () => {
   });
 
   it('POST /api/plan returns field-level 400 errors', async () => {
-    const res = await request(buildApp()).post('/api/plan').send(validInput({ guestCount: 0 })).expect(400);
+    const res = await request(buildApp())
+      .post('/api/plan')
+      .send(validInput({ guestCount: 0 }))
+      .expect(400);
     assert.equal(res.body.error, 'Invalid request');
     assert.equal(res.body.details[0].field, 'guestCount');
   });
@@ -62,7 +67,11 @@ describe('API', () => {
   });
 
   it('returns a generic 500 without internals when the planner crashes', async () => {
-    const planner = { generatePlan: async () => { throw new Error('db password is hunter2'); } };
+    const planner = {
+      generatePlan: async () => {
+        throw new Error('db password is hunter2');
+      },
+    };
     const res = await request(buildApp({ planner })).post('/api/plan').send(validInput()).expect(500);
     assert.ok(!JSON.stringify(res.body).includes('hunter2'));
   });
@@ -111,7 +120,9 @@ describe('API', () => {
     const logger = { info: (message, meta) => lines.push({ message, meta }), warn() {}, error() {} };
     const app = createApp({ planner: createPlanner({ logger: silentLogger }), config: loadConfig({}), logger });
 
-    const generated = await request(app).post('/api/plan').send(validInput({ preferences: 'secret allergy' }));
+    const generated = await request(app)
+      .post('/api/plan')
+      .send(validInput({ preferences: 'secret allergy' }));
     assert.match(generated.headers['x-request-id'], /^[0-9a-f-]{36}$/);
     const echoed = await request(app).get('/api/health').set('X-Request-Id', 'client-123');
     assert.equal(echoed.headers['x-request-id'], 'client-123');

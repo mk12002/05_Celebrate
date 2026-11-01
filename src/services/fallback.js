@@ -7,13 +7,29 @@ import { formatMoney } from '../utils.js';
  */
 
 const COMMON_TASKS = {
-  m12: ['Agree on the guest list size and overall budget', 'Shortlist and visit three venues', 'Set up a shared planning tracker'],
-  m6: ['Book the venue and pay the deposit', 'Book key vendors (catering, photography, entertainment)', 'Send save-the-dates'],
+  m12: [
+    'Agree on the guest list size and overall budget',
+    'Shortlist and visit three venues',
+    'Set up a shared planning tracker',
+  ],
+  m6: [
+    'Book the venue and pay the deposit',
+    'Book key vendors (catering, photography, entertainment)',
+    'Send save-the-dates',
+  ],
   m3: ['Finalise the menu with your caterer', 'Order decor and rentals', 'Send invitations with an RSVP deadline'],
-  m1: ['Confirm every vendor in writing, including arrival times', 'Chase outstanding RSVPs', 'Draft the day-of run sheet'],
+  m1: [
+    'Confirm every vendor in writing, including arrival times',
+    'Chase outstanding RSVPs',
+    'Draft the day-of run sheet',
+  ],
   w2: ['Give final headcount to caterer and venue', 'Prepare seating or zone plan', 'Assemble an emergency kit'],
   w1: ['Reconfirm deliveries and set-up times', 'Brief helpers on their roles', 'Pack decor and signage by zone'],
-  day: ['Arrive early to oversee set-up', 'Keep vendor contacts and payments handy', 'Assign someone to manage the timeline'],
+  day: [
+    'Arrive early to oversee set-up',
+    'Keep vendor contacts and payments handy',
+    'Assign someone to manage the timeline',
+  ],
 };
 
 const EXTRA_TASKS = {
@@ -72,7 +88,8 @@ const QUESTIONS = [
 const THEMES = {
   wedding: {
     name: 'Garden Romance',
-    concept: 'Soft botanical elegance with candlelight and natural textures. Personal touches make it feel intimate at any size.',
+    concept:
+      'Soft botanical elegance with candlelight and natural textures. Personal touches make it feel intimate at any size.',
     palette: [
       { name: 'Sage', hex: '#8A9A7B' },
       { name: 'Ivory', hex: '#F7F3EA' },
@@ -80,13 +97,29 @@ const THEMES = {
       { name: 'Champagne', hex: '#E6D3B3' },
       { name: 'Olive', hex: '#4F5D2F' },
     ],
-    decor: ['Low floral runners with greenery', 'Clustered candles in glass holders', 'Hand-lettered welcome sign', 'Fairy-light canopy over the dance floor'],
-    activities: ['Guest book with instant photos', 'First dance and open dance floor', 'Sparkler or petal send-off', 'Lawn games during cocktail hour'],
-    menuIdeas: ['Seasonal grazing table', 'Family-style mains', 'Signature his & hers cocktails', 'Late-night snack station'],
+    decor: [
+      'Low floral runners with greenery',
+      'Clustered candles in glass holders',
+      'Hand-lettered welcome sign',
+      'Fairy-light canopy over the dance floor',
+    ],
+    activities: [
+      'Guest book with instant photos',
+      'First dance and open dance floor',
+      'Sparkler or petal send-off',
+      'Lawn games during cocktail hour',
+    ],
+    menuIdeas: [
+      'Seasonal grazing table',
+      'Family-style mains',
+      'Signature his & hers cocktails',
+      'Late-night snack station',
+    ],
   },
   birthday: {
     name: 'Retro Disco Night',
-    concept: 'A glittering throwback party with bold colour and an irresistible playlist. Everyone gets a moment on the dance floor.',
+    concept:
+      'A glittering throwback party with bold colour and an irresistible playlist. Everyone gets a moment on the dance floor.',
     palette: [
       { name: 'Electric Purple', hex: '#6B2FB3' },
       { name: 'Hot Pink', hex: '#E83E8C' },
@@ -94,13 +127,29 @@ const THEMES = {
       { name: 'Midnight', hex: '#1B1B3A' },
       { name: 'Silver', hex: '#C0C0C8' },
     ],
-    decor: ['Mirror-ball centrepiece', 'Balloon arch at the entrance', 'Neon sign with the guest of honour\'s name', 'Photo backdrop with props'],
-    activities: ['Dance-off with prizes', 'Photo booth', 'Memory wall of photos through the years', 'Cake and toast moment'],
-    menuIdeas: ['Mini sliders and fries', 'Build-your-own taco bar', 'Mocktail and cocktail menu', 'Celebration cake and cupcakes'],
+    decor: [
+      'Mirror-ball centrepiece',
+      'Balloon arch at the entrance',
+      "Neon sign with the guest of honour's name",
+      'Photo backdrop with props',
+    ],
+    activities: [
+      'Dance-off with prizes',
+      'Photo booth',
+      'Memory wall of photos through the years',
+      'Cake and toast moment',
+    ],
+    menuIdeas: [
+      'Mini sliders and fries',
+      'Build-your-own taco bar',
+      'Mocktail and cocktail menu',
+      'Celebration cake and cupcakes',
+    ],
   },
   community: {
     name: 'Neighbourhood Festival',
-    concept: 'A welcoming, family-friendly celebration of local talent and food. Clear wayfinding and shaded spaces keep everyone comfortable.',
+    concept:
+      'A welcoming, family-friendly celebration of local talent and food. Clear wayfinding and shaded spaces keep everyone comfortable.',
     palette: [
       { name: 'Sunflower', hex: '#F2B705' },
       { name: 'Park Green', hex: '#2E7D32' },
@@ -108,9 +157,24 @@ const THEMES = {
       { name: 'Brick', hex: '#B5523B' },
       { name: 'Cream', hex: '#FFF8E7' },
     ],
-    decor: ['Bunting across entry points', 'Hand-painted zone signs', 'Shaded seating areas with hay bales', 'Map board at the entrance'],
-    activities: ['Local band and open-mic stage', 'Kids\' craft corner', 'Community notice and volunteer sign-up booth', 'Food truck alley'],
-    menuIdeas: ['Local food trucks', 'Free water refill stations', 'Bake sale by local groups', 'Vegetarian and allergen-labelled options'],
+    decor: [
+      'Bunting across entry points',
+      'Hand-painted zone signs',
+      'Shaded seating areas with hay bales',
+      'Map board at the entrance',
+    ],
+    activities: [
+      'Local band and open-mic stage',
+      "Kids' craft corner",
+      'Community notice and volunteer sign-up booth',
+      'Food truck alley',
+    ],
+    menuIdeas: [
+      'Local food trucks',
+      'Free water refill stations',
+      'Bake sale by local groups',
+      'Vegetarian and allergen-labelled options',
+    ],
   },
 };
 
@@ -142,7 +206,7 @@ const DAY_OF = {
     ['10:00', 'Gates open'],
     ['11:00', 'Opening remarks and first performance'],
     ['12:30', 'Food trucks at peak service'],
-    ['14:00', 'Kids\' activities and workshops'],
+    ['14:00', "Kids' activities and workshops"],
     ['16:00', 'Headline performance'],
     ['17:30', 'Closing thanks'],
     ['18:00', 'Teardown and litter pick'],
@@ -158,7 +222,9 @@ export function templatePlanContent(input, { budget, phases }) {
   const theme = THEMES[type];
   const amountFor = (id) => budget.categories.find((c) => c.id === id)?.amount ?? 0;
   const label = input.title || `your ${type}`;
-  const date = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeZone: 'UTC' }).format(new Date(`${input.eventDate}T00:00:00Z`));
+  const date = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeZone: 'UTC' }).format(
+    new Date(`${input.eventDate}T00:00:00Z`),
+  );
 
   return {
     summary:
@@ -199,9 +265,10 @@ const RAINY_ACTIVITIES = [
  */
 export function templateChatResponse(message) {
   const text = message.toLowerCase();
-  const move = /(?:reduce|cut|lower|decrease|take)\s+(?:the\s+)?([a-z &]+?)\s+(?:budget\s+)?by\s+(\d{1,3})\s*%.*?\b(?:to|into|for|on)\s+(?:the\s+)?([a-z &]+?)(?:\s+budget)?[.!]?$/.exec(
-    text,
-  );
+  const move =
+    /(?:reduce|cut|lower|decrease|take)\s+(?:the\s+)?([a-z &]+?)\s+(?:budget\s+)?by\s+(\d{1,3})\s*%.*?\b(?:to|into|for|on)\s+(?:the\s+)?([a-z &]+?)(?:\s+budget)?[.!]?$/.exec(
+      text,
+    );
   if (move) {
     const [, from, percent, to] = move;
     return {

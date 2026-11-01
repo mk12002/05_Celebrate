@@ -25,7 +25,11 @@ async function request(path, { method = 'GET', body } = {}) {
     });
   } catch (error) {
     const timedOut = error?.name === 'TimeoutError';
-    throw new ApiError(timedOut ? 'The planner took too long to respond. Please try again.' : 'Network error. Check your connection and try again.');
+    throw new ApiError(
+      timedOut
+        ? 'The planner took too long to respond. Please try again.'
+        : 'Network error. Check your connection and try again.',
+    );
   }
 
   const data = await response.json().catch(() => ({}));

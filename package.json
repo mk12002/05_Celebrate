@@ -13,8 +13,10 @@
     "test": "node --test --test-reporter=spec \"tests/**/*.test.js\"",
     "test:coverage": "node --test --experimental-test-coverage --test-coverage-exclude=\"tests/**\" --test-coverage-lines=95 --test-coverage-branches=85 --test-coverage-functions=95 \"tests/**/*.test.js\"",
     "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "audit": "npm audit --omit=dev --audit-level=moderate",
-    "check": "npm run lint && npm run typecheck && npm run test:coverage && npm run audit",
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm run test:coverage && npm run audit",
     "typecheck": "tsc -p tsconfig.json"
   },
   "keywords": [
@@ -43,6 +45,7 @@
     "eslint": "^10.13.0",
     "globals": "^17.13.0",
     "jsdom": "^27.4.0",
+    "prettier": "^3.9.10",
     "supertest": "^7.3.1",
     "typescript": "^5.9.3"
   }

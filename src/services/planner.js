@@ -93,7 +93,12 @@ export function createPlanner({ ai = null, cache = new TtlCache(), now = () => n
     // Preference-driven shifts are bounded and never drain the buffer.
     const shifts = content.allocationShifts
       .filter((s) => s.from !== 'contingency' && s.from !== s.to)
-      .map((s) => ({ type: 'move', from: s.from, to: s.to, percent: Math.min(Math.abs(s.percent), MAX_INITIAL_SHIFT_PERCENT) }));
+      .map((s) => ({
+        type: 'move',
+        from: s.from,
+        to: s.to,
+        percent: Math.min(Math.abs(s.percent), MAX_INITIAL_SHIFT_PERCENT),
+      }));
     const shifted = applyBudgetOperations(baseline, shifts, input).budget;
     const reasons = new Map(content.allocationShifts.map((s) => [s.to, s.reason]));
     const notes = new Map(content.categoryNotes.map((n) => [n.categoryId, n.note]));
@@ -169,63 +174,88 @@ function normaliseVendors(vendors, budget, phases) {
   });
 }
 
+/** @param {number} count @param {string} one @param {string} many */
+const plural = (count, one, many) => (count === 1 ? one : many);
+
+/** Applies budget operations; client-sent totals are re-derived first, never trusted. */
+function applyBudgetChanges(next, result, changes) {
+  next.budget = finalizeBudget(next.budget, next.input);
+  const budgetResult = applyBudgetOperations(next.budget, result.budgetOperations, {
+    eventType: next.input.eventType,
+    guestCount: next.input.guestCount,
+  });
+  next.budget = budgetResult.budget;
+  next.input.guestCount = budgetResult.guestCount;
+  next.input.budget = next.budget.total;
+  changes.push(...budgetResult.changes);
+}
+
+function addTasks(next, result, changes) {
+  const { phases } = next.timeline;
+  let added = 0;
+  for (const { phaseId, text } of result.addTasks) {
+    const phase = phases.find((p) => p.id === phaseId) ?? phases[0];
+    if (!phase || !text || phase.tasks.length >= MAX_TASKS_PER_PHASE) continue;
+    phase.tasks.push({ id: randomUUID(), text, done: false });
+    added += 1;
+  }
+  if (added) changes.push(`Added ${added} checklist ${plural(added, 'task', 'tasks')}.`);
+}
+
+function addVendors(next, result, changes) {
+  if (!result.addVendors.length) return;
+  const room = Math.max(0, MAX_VENDORS - next.vendors.length);
+  const added = normaliseVendors(result.addVendors.slice(0, room), next.budget, next.timeline.phases);
+  next.vendors.push(...added);
+  if (added.length) {
+    changes.push(`Added ${plural(added.length, 'vendor', 'vendors')}: ${added.map((v) => v.service).join(', ')}.`);
+  }
+}
+
+// The theme and day-of schedule are replaced only when the model flags an explicit request.
+function replaceTheme(next, result, changes) {
+  if (!result.updateTheme || !result.theme?.palette.length) return;
+  next.theme = result.theme;
+  changes.push(`Updated the theme to "${result.theme.name}".`);
+}
+
+function replaceDayOf(next, result, changes) {
+  if (!result.updateDayOf || !result.dayOf?.length) return;
+  next.timeline.dayOf = result.dayOf;
+  changes.push('Updated the day-of schedule.');
+}
+
+function addActivities(next, result, changes) {
+  const known = new Set(next.theme.activities.map((a) => a.toLowerCase()));
+  const fresh = result.addActivities.filter((a) => !known.has(a.toLowerCase()));
+  if (!fresh.length) return;
+  next.theme.activities = [...next.theme.activities, ...fresh].slice(0, MAX_ACTIVITIES);
+  changes.push(`Added ${fresh.length} ${plural(fresh.length, 'activity', 'activities')}.`);
+}
+
+/** Keeps vendor bookings pointing at budget categories that still exist. */
+function reconcileVendorCategories(next) {
+  const categoryIds = new Set(next.budget.categories.map((c) => c.id));
+  for (const vendor of next.vendors) {
+    if (!categoryIds.has(vendor.budgetCategory)) vendor.budgetCategory = 'contingency';
+  }
+}
+
 /**
  * Pure function: merges a validated chat result into a plan and reports
  * human-readable change descriptions.
  */
 export function applyChatResult(plan, result) {
   const next = structuredClone(plan);
-  const { eventType } = next.input;
+  const changes = [];
 
-  // Never trust client-side numbers: re-derive totals before applying ops.
-  next.budget = finalizeBudget(next.budget, next.input);
-  const budgetResult = applyBudgetOperations(next.budget, result.budgetOperations, {
-    eventType,
-    guestCount: next.input.guestCount,
-  });
-  next.budget = budgetResult.budget;
-  next.input.guestCount = budgetResult.guestCount;
-  next.input.budget = next.budget.total;
-  const changes = [...budgetResult.changes];
-
-  let addedTasks = 0;
-  for (const { phaseId, text } of result.addTasks) {
-    const phase = next.timeline.phases.find((p) => p.id === phaseId) ?? next.timeline.phases[0];
-    if (!phase || !text || phase.tasks.length >= MAX_TASKS_PER_PHASE) continue;
-    phase.tasks.push({ id: randomUUID(), text, done: false });
-    addedTasks += 1;
-  }
-  if (addedTasks) changes.push(`Added ${addedTasks} checklist task${addedTasks > 1 ? 's' : ''}.`);
-
-  if (result.addVendors.length) {
-    const room = Math.max(0, MAX_VENDORS - next.vendors.length);
-    const added = normaliseVendors(result.addVendors.slice(0, room), next.budget, next.timeline.phases);
-    next.vendors.push(...added);
-    if (added.length) changes.push(`Added vendor${added.length > 1 ? 's' : ''}: ${added.map((v) => v.service).join(', ')}.`);
-  }
-
-  if (result.updateTheme && result.theme && result.theme.palette.length) {
-    next.theme = result.theme;
-    changes.push(`Updated the theme to "${result.theme.name}".`);
-  }
-
-  const known = new Set(next.theme.activities.map((a) => a.toLowerCase()));
-  const newActivities = result.addActivities.filter((a) => !known.has(a.toLowerCase()));
-  if (newActivities.length) {
-    next.theme.activities = [...next.theme.activities, ...newActivities].slice(0, MAX_ACTIVITIES);
-    changes.push(`Added ${newActivities.length} activit${newActivities.length > 1 ? 'ies' : 'y'}.`);
-  }
-
-  if (result.updateDayOf && result.dayOf && result.dayOf.length) {
-    next.timeline.dayOf = result.dayOf;
-    changes.push('Updated the day-of schedule.');
-  }
-
-  // Keep vendor bookings pointing at categories that still exist.
-  const categoryIds = new Set(next.budget.categories.map((c) => c.id));
-  for (const vendor of next.vendors) {
-    if (!categoryIds.has(vendor.budgetCategory)) vendor.budgetCategory = 'contingency';
-  }
+  applyBudgetChanges(next, result, changes);
+  addTasks(next, result, changes);
+  addVendors(next, result, changes);
+  replaceTheme(next, result, changes);
+  addActivities(next, result, changes);
+  replaceDayOf(next, result, changes);
+  reconcileVendorCategories(next);
 
   return { plan: next, changes };
 }

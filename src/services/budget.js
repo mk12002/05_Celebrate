@@ -164,6 +164,74 @@ function uniqueId(categories, label) {
 }
 
 /**
+ * Mutable working state shared by the operation handlers below.
+ * @typedef {object} OperationState
+ * @property {import('../types.js').BudgetCategory[]} categories
+ * @property {number} guests
+ * @property {string[]} changes
+ * @property {(amount: number) => string} money
+ */
+
+/** Finds the destination category, creating it when the AI names a new one. */
+function resolveDestination(state, from, name) {
+  const existing = findCategory(state.categories, name);
+  if (existing) return existing === from ? null : existing;
+  if (!name || state.categories.length >= LIMITS.maxCategories) {
+    state.changes.push(`Skipped a budget move: could not create category "${name}".`);
+    return null;
+  }
+  const created = { id: uniqueId(state.categories, name), label: titleCase(name), amount: 0, percent: 0, note: '' };
+  state.categories.push(created);
+  return created;
+}
+
+/** @param {OperationState} state @param {import('../types.js').BudgetOperation} op */
+function moveFunds(state, op) {
+  const from = findCategory(state.categories, op.from);
+  if (!from || from.amount <= 0) {
+    state.changes.push(`Skipped a budget move: "${op.from}" has no funds to move.`);
+    return;
+  }
+  const to = resolveDestination(state, from, op.to);
+  if (!to) return;
+
+  const requested = Number.isFinite(op.percent)
+    ? (from.amount * clamp(op.percent, 0, 100)) / 100
+    : Number(op.amount) || 0;
+  const amount = Math.round(clamp(requested, 0, from.amount));
+  if (amount === 0) return;
+  from.amount -= amount;
+  to.amount += amount;
+  state.changes.push(`Moved ${state.money(amount)} from ${from.label} to ${to.label}.`);
+}
+
+/** Rescales every category proportionally; rounding leftovers go to the buffer. */
+function rescaleTotal(state, op) {
+  const newTotal = Math.round(clamp(Number(op.amount) || 0, LIMITS.minBudget, LIMITS.maxBudget));
+  const oldTotal = state.categories.reduce((sum, c) => sum + c.amount, 0);
+  if (oldTotal <= 0 || newTotal === oldTotal) return;
+
+  state.categories = state.categories.map((c) => ({ ...c, amount: Math.floor((c.amount * newTotal) / oldTotal) }));
+  const remainder = newTotal - state.categories.reduce((sum, c) => sum + c.amount, 0);
+  const sink = state.categories.find((c) => c.id === CONTINGENCY_ID) ?? state.categories[0];
+  sink.amount += remainder;
+  state.changes.push(`Rescaled the total budget from ${state.money(oldTotal)} to ${state.money(newTotal)}.`);
+}
+
+function setGuestCount(state, op) {
+  const next = Math.round(clamp(Number(op.guestCount) || 0, 1, LIMITS.maxGuests));
+  if (next === state.guests) return;
+  state.changes.push(`Updated guest count from ${state.guests} to ${next}.`);
+  state.guests = next;
+}
+
+const OPERATION_HANDLERS = Object.freeze({
+  move: moveFunds,
+  set_total: rescaleTotal,
+  set_guest_count: setGuestCount,
+});
+
+/**
  * Applies AI-proposed budget operations to a budget.
  *
  * Supported operations:
@@ -172,62 +240,29 @@ function uniqueId(categories, label) {
  *  - { type: 'set_total', amount } rescale every category to a new total
  *  - { type: 'set_guest_count', guestCount } update headcount for per-guest metrics
  *
+ * Unknown operation types are ignored.
+ *
  * @returns {{budget: object, guestCount: number, changes: string[]}}
  */
 export function applyBudgetOperations(budget, operations, { eventType, guestCount }) {
-  let categories = budget.categories.map((c) => ({ ...c }));
-  let guests = guestCount;
-  const changes = [];
-  const money = (n) => formatMoney(n, budget.currency);
+  /** @type {OperationState} */
+  const state = {
+    categories: budget.categories.map((c) => ({ ...c })),
+    guests: guestCount,
+    changes: [],
+    money: (amount) => formatMoney(amount, budget.currency),
+  };
 
   for (const op of operations ?? []) {
-    if (op.type === 'move') {
-      const from = findCategory(categories, op.from);
-      if (!from || from.amount <= 0) {
-        changes.push(`Skipped a budget move: "${op.from}" has no funds to move.`);
-        continue;
-      }
-      let to = findCategory(categories, op.to);
-      if (to === from) continue;
-      if (!to) {
-        if (!op.to || categories.length >= LIMITS.maxCategories) {
-          changes.push(`Skipped a budget move: could not create category "${op.to}".`);
-          continue;
-        }
-        to = { id: uniqueId(categories, op.to), label: titleCase(op.to), amount: 0, percent: 0, note: '' };
-        categories.push(to);
-      }
-      const requested = Number.isFinite(op.percent)
-        ? (from.amount * clamp(op.percent, 0, 100)) / 100
-        : Number(op.amount) || 0;
-      const amount = Math.round(clamp(requested, 0, from.amount));
-      if (amount === 0) continue;
-      from.amount -= amount;
-      to.amount += amount;
-      changes.push(`Moved ${money(amount)} from ${from.label} to ${to.label}.`);
-    } else if (op.type === 'set_total') {
-      const newTotal = Math.round(clamp(Number(op.amount) || 0, LIMITS.minBudget, LIMITS.maxBudget));
-      const oldTotal = categories.reduce((sum, c) => sum + c.amount, 0);
-      if (oldTotal <= 0 || newTotal === oldTotal) continue;
-      categories = categories.map((c) => ({ ...c, amount: Math.floor((c.amount * newTotal) / oldTotal) }));
-      const remainder = newTotal - categories.reduce((sum, c) => sum + c.amount, 0);
-      const sink = categories.find((c) => c.id === CONTINGENCY_ID) ?? categories[0];
-      sink.amount += remainder;
-      changes.push(`Rescaled the total budget from ${money(oldTotal)} to ${money(newTotal)}.`);
-    } else if (op.type === 'set_guest_count') {
-      const next = Math.round(clamp(Number(op.guestCount) || 0, 1, LIMITS.maxGuests));
-      if (next === guests) continue;
-      changes.push(`Updated guest count from ${guests} to ${next}.`);
-      guests = next;
-    }
+    if (Object.hasOwn(OPERATION_HANDLERS, op.type)) OPERATION_HANDLERS[op.type](state, op);
   }
 
   // Drop empty categories the user explicitly emptied, but never the buffer.
-  categories = categories.filter((c) => c.amount > 0 || c.id === CONTINGENCY_ID);
+  const categories = state.categories.filter((c) => c.amount > 0 || c.id === CONTINGENCY_ID);
 
   return {
-    budget: finalizeBudget({ ...budget, categories }, { eventType, guestCount: guests }),
-    guestCount: guests,
-    changes,
+    budget: finalizeBudget({ ...budget, categories }, { eventType, guestCount: state.guests }),
+    guestCount: state.guests,
+    changes: state.changes,
   };
 }
