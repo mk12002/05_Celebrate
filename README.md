@@ -12,7 +12,7 @@ You enter the event type, budget, date, guest count and preferences. **Google Ge
 | **Conversational iteration** | A chat panel accepts requests like *"Reduce catering by 10% and reallocate it to live music"* or *"Suggest indoor backup activities for rainy weather"*. Each change is applied to the plan, and every reply lists exactly what changed. |
 
 [![CI](../../actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
-· 130 tests · 99.7% line / 91.6% branch coverage · 0 TypeScript errors · 0 axe-core WCAG 2.2 AA violations · 0 npm audit vulnerabilities
+· 133 tests · 99.7% line / 90.6% branch coverage · 0 TypeScript errors · 0 axe-core WCAG 2.2 AA violations · 0 npm audit vulnerabilities
 
 ## Screenshots
 
@@ -79,7 +79,7 @@ public/
   css/styles.css          Responsive light/dark theme, print stylesheet
   js/                     main (entry) · controller (state & events, dependency-injected) · render (DOM)
                           api · storage · format · ics (calendar export) · dom
-tests/                    130 tests: node:test, supertest, jsdom + axe-core (99.7% line coverage)
+tests/                    133 tests: node:test, supertest, jsdom + axe-core (99.7% line coverage)
 docs/screenshots/         README screenshots (real Gemini output)
 .github/workflows/ci.yml  Lint, tests with coverage gates and npm audit on Node 22 and 24
 ```
@@ -139,7 +139,7 @@ Get a free Gemini API key at <https://aistudio.google.com/apikey>. Without a key
 ### Scripts
 
 ```bash
-npm test               # 130 unit, integration, UI-flow and accessibility tests
+npm test               # 133 unit, integration, UI-flow and accessibility tests
 npm run test:coverage  # coverage report, fails below 95% lines / 85% branches / 95% functions
 npm run lint           # ESLint (flat config)
 npm run audit          # npm audit of production dependencies
@@ -198,7 +198,7 @@ See [SECURITY.md](SECURITY.md) for the full threat model.
 - The server is stateless (the plan round-trips with the client), so it scales horizontally.
 
 ### Testing
-130 tests run with Node's built-in runner. CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs lint, the TypeScript check, the tests and `npm audit` on Node 22 and 24, and fails if coverage drops below its thresholds. Server code and browser code are both measured.
+133 tests run with Node's built-in runner. CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs lint, the TypeScript check, the tests and `npm audit` on Node 22 and 24, and fails if coverage drops below its thresholds. Server code and browser code are both measured.
 
 | File | What it covers |
 | --- | --- |
